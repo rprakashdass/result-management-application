@@ -4,6 +4,7 @@
 // import "express";
 
 require('dotenv').config();
+const mongoose = require('mongoose');
 const express = require('express');
 const app = express();
 const port = process.env.PORT;
@@ -23,6 +24,9 @@ app.use((req, res, next) => {
     next(); //next should be called to goto next endpoint else response will get stucked in middleware
 })
 
-app.listen(port, () => {
-    console.log('Application is loading on port ' + port + '!...')
-})
+// MangoDb connect
+mongoose.connect(process.env.MONGO_URI).then(() => {
+    app.listen(port, () => {
+        console.log('listening to port ' + port + '!...')
+    });
+}).catch((error) => console.log(error));
