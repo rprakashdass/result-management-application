@@ -4,13 +4,27 @@
 // import "express";
 
 require('dotenv').config();
-const mongoose = require('mongoose');
 const express = require('express');
+const path = require('path');
+const routes = require('./routes/api/subjects')
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 5000;
 
-app.get("/", (req,res) => {
-    res.send("hellohgkjjhvj !")
+// For API connectivity (to handle different types of data)
+const cors = require('cors');
+const bodyParser = require('body-parser');
+
+app.use(cors({origin: true, credentials: true}))
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+app.use("/api/subjects", routes);
+
+// Database Connect
+const connectDB = require('./config/db')
+connectDB();
+
+app.get("/", (req, res) => {
+    res.send("hellohgkjjhvj!")
 })
 
 /* Midleware (middleware acts as middleman between user and server)
@@ -18,15 +32,13 @@ app.get("/", (req,res) => {
     req -> response
     next -> Pointer
 */
-
 app.use((req, res, next) => {
-    console.log("path is " + req.path + "methode is " + req.method);
+    console.log("path is " + req.path + " and method is " + req.method);
     next(); //next should be called to goto next endpoint else response will get stucked in middleware
 })
 
-// MangoDb connect
-mongoose.connect(process.env.MONGO_URI).then(() => {
-    app.listen(port, () => {
-        console.log('listening to port ' + port + '!...')
-    });
-}).catch((error) => console.log(error));
+// app.use('http://localhost:4000/static/', express.static(path.join(__dirname, 'public')))
+
+app.listen(port, () => {
+    console.log(`Server Running on PORT ${port}`);
+})
